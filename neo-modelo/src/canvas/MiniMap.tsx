@@ -11,7 +11,7 @@ export function MiniMap() {
 
   const w = 200, h = 150;
   const scale = 0.2;
-  const stroke = theme === "dark" ? "#e5e7eb" : "#111";
+  const stroke = theme === "dark" ? "#a1a1aa" : "#6b7280";
 
   return (
     <Stage
@@ -19,8 +19,8 @@ export function MiniMap() {
       height={h}
       scaleX={scale}
       scaleY={scale}
-      x={-viewport.offset.x * scale}
-      y={-viewport.offset.y * scale}
+      x={-(viewport.offset.x / viewport.scale) * scale}
+      y={-(viewport.offset.y / viewport.scale) * scale}
       listening={false}
     >
       <Layer>

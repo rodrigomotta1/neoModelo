@@ -1,4 +1,4 @@
-import { memo } from "react";
+import { memo, useState } from "react";
 import { Group, Rect, Text, Circle } from "react-konva";
 import { useERStore } from "@/core/store";
 import type { EntityNode as E } from "@/core/types";
@@ -14,6 +14,8 @@ function EntityNodeBase({ node, onContextMenu, draggable = true, onStartConnect 
   const connect = useERStore((s) => s.connect);
   const snap = useERStore((s) => s.settings.snap);
   const { theme } = useTheme();
+
+  const [hover, setHover] = useState(false);
 
   const W = Math.max(100, node.name.length * 9);
   const H = 50;
@@ -41,6 +43,8 @@ function EntityNodeBase({ node, onContextMenu, draggable = true, onStartConnect 
       onContextMenu={(e) => {
         onContextMenu?.(e);
       }}
+      onMouseEnter={() => setHover(true)}
+      onMouseLeave={() => setHover(false)}
     >
       <Rect
         x={-W/2}
@@ -75,7 +79,16 @@ function EntityNodeBase({ node, onContextMenu, draggable = true, onStartConnect 
       )}
 
       {[{x:0,y:-H/2},{x:W/2,y:0},{x:0,y:H/2},{x:-W/2,y:0}].map((a,i)=>(
-        <Circle key={i} x={a.x} y={a.y} radius={4} fill={theme === "dark" ? "#27272a" : "#fff"} stroke="#2563eb" onMouseDown={(e)=>{e.cancelBubble=true; onStartConnect?.(node.id,{x:node.pos.x + a.x,y:node.pos.y + a.y});}} />
+        <Circle
+          key={i}
+          x={a.x}
+          y={a.y}
+          radius={4}
+          visible={hover}
+          fill={theme === "dark" ? "#27272a" : "#fff"}
+          stroke="#2563eb"
+          onMouseDown={(e)=>{e.cancelBubble=true; onStartConnect?.(node.id,{x:node.pos.x + a.x,y:node.pos.y + a.y});}}
+        />
       ))}
     </Group>
   );
