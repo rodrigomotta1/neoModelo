@@ -30,6 +30,7 @@ export function DefaultEdge({ edge, nodes, onContextMenu }: { edge: Edge; nodes:
           y={mid.y + 6}
           text={[edge.cardinality ?? "", edge.participation ?? ""].filter(Boolean).join(" / ")}
           fontSize={12}
+          fontFamily="var(--font-sans)"
           fill={theme === "dark" ? "#e5e7eb" : "#111"}
         />
       )}

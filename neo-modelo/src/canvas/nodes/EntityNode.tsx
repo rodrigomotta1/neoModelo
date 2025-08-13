@@ -1,5 +1,5 @@
 import { memo } from "react";
-import { Group, Rect, Text } from "react-konva";
+import { Group, Rect, Text, Circle } from "react-konva";
 import { useERStore } from "@/core/store";
 import type { EntityNode as E } from "@/core/types";
 import { useTheme } from "@/theme/useTheme";
@@ -8,7 +8,7 @@ import type { KonvaEventObject } from "konva/lib/Node";
 const GRID = 20;
 
 /** Entity rectangle with optional double border when weak. */
-function EntityNodeBase({ node, onContextMenu, draggable = true }: { node: E; onContextMenu?: (e: KonvaEventObject<MouseEvent>) => void; draggable?: boolean }) {
+function EntityNodeBase({ node, onContextMenu, draggable = true, onStartConnect }: { node: E; onContextMenu?: (e: KonvaEventObject<MouseEvent>) => void; draggable?: boolean; onStartConnect?: (id: string, pos: { x: number; y: number }) => void }) {
   const setNodePos = useERStore((s) => s.setNodePos);
   const setSelection = useERStore((s) => s.setSelection);
   const connect = useERStore((s) => s.connect);
@@ -43,30 +43,40 @@ function EntityNodeBase({ node, onContextMenu, draggable = true }: { node: E; on
       }}
     >
       <Rect
+        x={-W/2}
+        y={-H/2}
         width={W}
         height={H}
-        cornerRadius={6}
         fill={theme === "dark" ? "#27272a" : "#fff"}
         stroke={node.selected ? "#2563eb" : theme === "dark" ? "#e5e7eb" : "#111"}
         strokeWidth={node.selected ? 2 : 1}
       />
       <Text
         text={node.name}
-        x={8}
-        y={H / 2 - 8}
-        fontFamily="Inter, sans-serif"
+        x={-W/2}
+        y={-H/2}
+        width={W}
+        height={H}
+        align="center"
+        verticalAlign="middle"
+        fontFamily="var(--font-sans)"
         fill={theme === "dark" ? "#e5e7eb" : "#111"}
       />
       {node.weak && (
         <Rect
+          x={-W/2}
+          y={-H/2}
           width={W}
           height={H}
-          cornerRadius={6}
           listening={false}
           stroke={theme === "dark" ? "#e5e7eb" : "#111"}
           strokeWidth={1}
         />
       )}
+
+      {[{x:0,y:-H/2},{x:W/2,y:0},{x:0,y:H/2},{x:-W/2,y:0}].map((a,i)=>(
+        <Circle key={i} x={a.x} y={a.y} radius={4} fill={theme === "dark" ? "#27272a" : "#fff"} stroke="#2563eb" onMouseDown={(e)=>{e.cancelBubble=true; onStartConnect?.(node.id,{x:node.pos.x + a.x,y:node.pos.y + a.y});}} />
+      ))}
     </Group>
   );
 }
