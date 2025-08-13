@@ -25,7 +25,7 @@ export function Toolbar() {
   const zoom = (delta: number) => setViewport(viewport.scale * delta, viewport.offset);
 
   return (
-    <header className="h-14 w-full border-b border-border bg-background/60 backdrop-blur flex items-center px-4 py-2 gap-3">
+    <header className="h-14 w-full shadow-md bg-background/60 backdrop-blur flex items-center px-4 py-2 gap-3">
       <Button variant="outline" size="sm" onClick={() => spawn(addEntity)} className="gap-1">
         <Square className="h-4 w-4" /> Entity
       </Button>

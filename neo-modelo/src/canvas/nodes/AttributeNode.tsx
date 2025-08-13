@@ -1,4 +1,4 @@
-import { memo } from "react";
+import { memo, useState } from "react";
 import { Group, Circle, Text } from "react-konva";
 import { useERStore } from "@/core/store";
 import type { AttributeNode as A } from "@/core/types";
@@ -13,6 +13,8 @@ function AttributeNodeBase({ node, draggable = true, onStartConnect }: { node: A
   const connect = useERStore((s) => s.connect);
   const snap = useERStore((s) => s.settings.snap);
   const { theme } = useTheme();
+
+  const [hover, setHover] = useState(false);
 
   const R = 12;
 
@@ -36,6 +38,8 @@ function AttributeNodeBase({ node, draggable = true, onStartConnect }: { node: A
           setSelection([node.id]);
         }
       }}
+      onMouseEnter={() => setHover(true)}
+      onMouseLeave={() => setHover(false)}
     >
       <Circle
         radius={R}
@@ -59,7 +63,16 @@ function AttributeNodeBase({ node, draggable = true, onStartConnect }: { node: A
       />
 
       {[{x:0,y:-R},{x:R,y:0},{x:0,y:R},{x:-R,y:0}].map((a,i)=>(
-        <Circle key={i} x={a.x} y={a.y} radius={4} fill={theme === "dark" ? "#27272a" : "#fff"} stroke="#2563eb" onMouseDown={(e)=>{e.cancelBubble=true; onStartConnect?.(node.id,{x:node.pos.x + a.x,y:node.pos.y + a.y});}} />
+        <Circle
+          key={i}
+          x={a.x}
+          y={a.y}
+          radius={4}
+          visible={hover}
+          fill={theme === "dark" ? "#27272a" : "#fff"}
+          stroke="#2563eb"
+          onMouseDown={(e)=>{e.cancelBubble=true; onStartConnect?.(node.id,{x:node.pos.x + a.x,y:node.pos.y + a.y});}}
+        />
       ))}
     </Group>
   );

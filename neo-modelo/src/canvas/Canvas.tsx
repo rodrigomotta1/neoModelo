@@ -186,7 +186,11 @@ export function Canvas() {
         )}
       </Stage>
 
-      {showMinimap && <div className="absolute top-2 right-2 border border-border rounded bg-background/80"><MiniMap /></div>}
+      {showMinimap && (
+        <div className="absolute top-2 right-2 bg-muted/60">
+          <MiniMap />
+        </div>
+      )}
 
       {menu && (
         <ContextMenu open onOpenChange={() => setMenu(null)}>

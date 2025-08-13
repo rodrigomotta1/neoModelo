@@ -1,4 +1,4 @@
-import { memo } from "react";
+import { memo, useState } from "react";
 import { Group, Line, Text, Circle } from "react-konva";
 import { useERStore } from "@/core/store";
 import type { RelationshipNode as R } from "@/core/types";
@@ -14,6 +14,8 @@ function RelationshipNodeBase({ node, onContextMenu, draggable = true, onStartCo
   const connect = useERStore((s) => s.connect);
   const snap = useERStore((s) => s.settings.snap);
   const { theme } = useTheme();
+
+  const [hover, setHover] = useState(false);
 
   const W = Math.max(120, node.name.length * 10);
   const H = W * 0.6;
@@ -42,6 +44,8 @@ function RelationshipNodeBase({ node, onContextMenu, draggable = true, onStartCo
       onContextMenu={(e) => {
         onContextMenu?.(e);
       }}
+      onMouseEnter={() => setHover(true)}
+      onMouseLeave={() => setHover(false)}
     >
       <Line
         points={diamond}
@@ -64,7 +68,16 @@ function RelationshipNodeBase({ node, onContextMenu, draggable = true, onStartCo
       {node.identifying && <Line points={diamond.map((v) => v * 0.9)} closed stroke={theme === "dark" ? "#e5e7eb" : "#111"} />}
 
       {[{x:0,y:-H/2},{x:W/2,y:0},{x:0,y:H/2},{x:-W/2,y:0}].map((a,i)=>(
-        <Circle key={i} x={a.x} y={a.y} radius={4} fill={theme === "dark" ? "#27272a" : "#fff"} stroke="#2563eb" onMouseDown={(e)=>{e.cancelBubble=true; onStartConnect?.(node.id,{x:node.pos.x + a.x,y:node.pos.y + a.y});}} />
+        <Circle
+          key={i}
+          x={a.x}
+          y={a.y}
+          radius={4}
+          visible={hover}
+          fill={theme === "dark" ? "#27272a" : "#fff"}
+          stroke="#2563eb"
+          onMouseDown={(e)=>{e.cancelBubble=true; onStartConnect?.(node.id,{x:node.pos.x + a.x,y:node.pos.y + a.y});}}
+        />
       ))}
     </Group>
   );
