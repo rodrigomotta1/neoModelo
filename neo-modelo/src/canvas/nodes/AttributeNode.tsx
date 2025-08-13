@@ -7,7 +7,7 @@ import { useTheme } from "@/theme/useTheme";
 const GRID = 20;
 
 /** Attribute circle with label to the side. */
-function AttributeNodeBase({ node, draggable = true }: { node: A; draggable?: boolean }) {
+function AttributeNodeBase({ node, draggable = true, onStartConnect }: { node: A; draggable?: boolean; onStartConnect?: (id: string, pos: { x: number; y: number }) => void }) {
   const setNodePos = useERStore((s) => s.setNodePos);
   const setSelection = useERStore((s) => s.setSelection);
   const connect = useERStore((s) => s.connect);
@@ -54,9 +54,13 @@ function AttributeNodeBase({ node, draggable = true }: { node: A; draggable?: bo
         text={node.name}
         x={R + 6}
         y={-6}
-        fontFamily="Inter, sans-serif"
+        fontFamily="var(--font-sans)"
         fill={theme === "dark" ? "#e5e7eb" : "#111"}
       />
+
+      {[{x:0,y:-R},{x:R,y:0},{x:0,y:R},{x:-R,y:0}].map((a,i)=>(
+        <Circle key={i} x={a.x} y={a.y} radius={4} fill={theme === "dark" ? "#27272a" : "#fff"} stroke="#2563eb" onMouseDown={(e)=>{e.cancelBubble=true; onStartConnect?.(node.id,{x:node.pos.x + a.x,y:node.pos.y + a.y});}} />
+      ))}
     </Group>
   );
 }

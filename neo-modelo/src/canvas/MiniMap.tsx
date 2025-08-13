@@ -1,6 +1,7 @@
 import { Stage, Layer, Line, Rect, Circle } from "react-konva";
 import { useERStore } from "@/core/store";
 import { useTheme } from "@/theme/useTheme";
+import { stageRefGlobal } from "./Canvas";
 
 export function MiniMap() {
   const nodes = useERStore(s => s.nodes);
@@ -34,11 +35,10 @@ export function MiniMap() {
         {nodes.map(n => {
           switch (n.kind) {
             case "entity": {
-              return <Rect key={n.id} x={n.pos.x - 50} y={n.pos.y - 25} width={100} height={50} cornerRadius={6} stroke={stroke} />;
+              return <Rect key={n.id} x={n.pos.x - 50} y={n.pos.y - 25} width={100} height={50} stroke={stroke} />;
             }
             case "relationship": {
-              const S = 40;
-              const d = [0, -S / 2, S / 2, 0, 0, S / 2, -S / 2, 0];
+              const W = 60, H = 40; const d = [0, -H / 2, W / 2, 0, 0, H / 2, -W / 2, 0];
               return <Line key={n.id} x={n.pos.x} y={n.pos.y} points={d} closed stroke={stroke} />;
             }
             case "attribute": {
@@ -48,6 +48,15 @@ export function MiniMap() {
               return null;
           }
         })}
+      </Layer>
+      <Layer>
+        {(() => {
+          const stage = stageRefGlobal.current;
+          if (!stage) return null;
+          const vw = stage.width() / viewport.scale;
+          const vh = stage.height() / viewport.scale;
+          return <Rect x={-viewport.offset.x} y={-viewport.offset.y} width={vw} height={vh} stroke={"#2563eb"} />;
+        })()}
       </Layer>
     </Stage>
   );
