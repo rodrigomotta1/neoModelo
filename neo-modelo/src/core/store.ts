@@ -9,9 +9,9 @@ import type { ERState, Vec2 } from "./types";
  * Keep them minimal and predictable; UI consumes these via selectors to avoid excess re-renders.
  */
 type Actions = {
-    addEntity: (pos: Vec2, name?: string) => void;
-    addRelationship: (pos: Vec2, name?: string) => void;
-    addAttribute: (pos: Vec2, name?: string) => void;
+    addEntity: (pos: Vec2, name?: string) => string;
+    addRelationship: (pos: Vec2, name?: string) => string;
+    addAttribute: (pos: Vec2, name?: string) => string;
 
     setNodePos: (id: string, pos: Vec2, snap?: number) => void;
     setNodeProp: (id: string, patch: Partial<ERState["nodes"][number]>) => void;
@@ -24,8 +24,9 @@ type Actions = {
     deleteSelected: () => void;
 
     setViewport: (scale: number, offset: Vec2) => void;
-
-    toggleProperties: (open?: boolean) => void;
+    toggleGrid: () => void;
+    toggleSnap: () => void;
+    toggleMinimap: () => void;
 
     undo: () => void;
     redo: () => void;
@@ -36,7 +37,7 @@ const initial: ERState = {
     nodes: [],
     edges: [],
     viewport: { scale: 1, offset: { x: 0, y: 0 } },
-    ui: { propertiesOpen: false },
+    settings: { showGrid: true, snap: true, showMinimap: false },
 };
 
 export const useERStore = create(
@@ -44,14 +45,23 @@ export const useERStore = create(
         (set, get) => ({
             ...initial,
 
-            addEntity: (pos, name = "Entity") =>
-                set(produce((s: ERState) => { s.nodes.push({ id: nanoid(), kind: "entity", name, pos }); })),
+            addEntity: (pos, name = "Entity") => {
+                const id = nanoid();
+                set(produce((s: ERState) => { s.nodes.push({ id, kind: "entity", name, pos }); }));
+                return id;
+            },
 
-            addRelationship: (pos, name = "Rel") =>
-                set(produce((s: ERState) => { s.nodes.push({ id: nanoid(), kind: "relationship", name, pos }); })),
+            addRelationship: (pos, name = "Rel") => {
+                const id = nanoid();
+                set(produce((s: ERState) => { s.nodes.push({ id, kind: "relationship", name, pos }); }));
+                return id;
+            },
 
-            addAttribute: (pos, name = "attr") =>
-                set(produce((s: ERState) => { s.nodes.push({ id: nanoid(), kind: "attribute", name, pos }); })),
+            addAttribute: (pos, name = "attr") => {
+                const id = nanoid();
+                set(produce((s: ERState) => { s.nodes.push({ id, kind: "attribute", name, pos }); }));
+                return id;
+            },
 
             setNodePos: (id, pos, snap = 10) =>
                 set(produce((s: ERState) => {
@@ -100,11 +110,17 @@ export const useERStore = create(
             setViewport: (scale, offset) =>
                 set(produce((s: ERState) => { s.viewport = { scale, offset }; })),
 
-            toggleProperties: (open) =>
-                set(produce((s: ERState) => { s.ui.propertiesOpen = open ?? !s.ui.propertiesOpen; })),
+            toggleGrid: () =>
+                set(produce((s: ERState) => { s.settings.showGrid = !s.settings.showGrid; })),
 
-            undo: () => (get() as any).temporal.undo(),
-            redo: () => (get() as any).temporal.redo(),
+            toggleSnap: () =>
+                set(produce((s: ERState) => { s.settings.snap = !s.settings.snap; })),
+
+            toggleMinimap: () =>
+                set(produce((s: ERState) => { s.settings.showMinimap = !s.settings.showMinimap; })),
+
+            undo: () => (get() as unknown as { temporal: { undo: () => void } }).temporal.undo(),
+            redo: () => (get() as unknown as { temporal: { redo: () => void } }).temporal.redo(),
             reset: (s) => set({ ...(s ? { ...initial, ...s } : initial) }),
         }),
     { limit: 100 }
