@@ -16,6 +16,7 @@ export type AttributeNode = NodeBase & {
     derived?: boolean;
     multivalued?: boolean;
     optional?: boolean;
+    domain?: string;
 };
 
 export type Cardinality = "1" | "N" | "M";
