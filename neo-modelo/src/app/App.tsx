@@ -1,6 +1,5 @@
 import { Toolbar } from "@/ui/Toolbar";
 import { Canvas } from "@/canvas/Canvas";
-import { PropertiesPanel } from "@/ui/PropertiesPanel";
 
 export default function App () {
     return (
@@ -9,7 +8,6 @@ export default function App () {
             <div className="flex-1">
                 <Canvas />
             </div>
-            <PropertiesPanel />
         </div>
     )
 }

@@ -10,7 +10,13 @@ export type NodeBase = {
 
 export type EntityNode = NodeBase & { kind: "entity"; weak?: boolean };
 export type RelationshipNode = NodeBase & { kind: "relationship"; identifying?: boolean };
-export type AttributeNode = NodeBase & { kind: "attribute"; key?: boolean; derived?: boolean; multivalued?: boolean };
+export type AttributeNode = NodeBase & {
+    kind: "attribute";
+    key?: boolean;
+    derived?: boolean;
+    multivalued?: boolean;
+    optional?: boolean;
+};
 
 export type Cardinality = "1" | "N" | "M";
 export type Participation = "total" | "partial";
@@ -28,5 +34,9 @@ export type ERState = {
     nodes: Array<EntityNode | RelationshipNode | AttributeNode>;
     edges: Edge[];
     viewport: { scale: number; offset: Vec2 };
-    ui: { propertiesOpen: boolean }; // controls PropertiesPanel visibility
+    settings: {
+        showGrid: boolean;
+        snap: boolean;
+        showMinimap: boolean;
+    };
 };
